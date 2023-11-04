@@ -1,6 +1,6 @@
 # Introduction
 
-Stop saving images in a single thread. It's slow. Use asyncio or multi-threading! 
+Stop saving images in a single thread. It's slow. Use asyncio or ThreadPoolExecutor! 
 
 This project is a simple example of how to use asyncio and multi-threading to save images in parallel. You have no more
 excuses to save images in a single thread.
