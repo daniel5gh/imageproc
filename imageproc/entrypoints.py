@@ -39,9 +39,20 @@ def measure():
         default=3,
         help="Depth of the generated images. Default: 3",
     )
+    parser.add_argument(
+        "-s",
+        "--shm",
+        default=False,
+        action="store_true",
+        help="Use /dev/shm instead of current dir, Default: False",
+    )
+
     args = parser.parse_args()
 
-    with tempfile.TemporaryDirectory(dir="", prefix="output") as tmp_dirname:
+    dir_ = "/dev/shm" if args.shm else "."
+    del args.shm
+
+    with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
         experiment1(args, Path(tmp_dirname))
 
 

@@ -8,6 +8,7 @@ authors = ["Daniël van Adrichem <daniel5gh@spiet.nl>"]
 python = "^3.11"
 opencv-python = "^4.8.1"
 tqdm = "^4.66.1"
+psutil = "^5.9.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.3"

@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import cv2
 import numpy as np
+import psutil
 import tqdm
 
 
@@ -97,6 +98,13 @@ def measure_performance(banner="", count=1):
 
 
 def experiment1(args, output_path):
+    # print basic machine specs from psutil
+    print(f"CPU count: {psutil.cpu_count()}")
+    print(f"CPU freq: {psutil.cpu_freq()}")
+    load = psutil.getloadavg()
+    print(f"current load {load}")
+    print(f"writing to {output_path.absolute()}")
+
     with measure_performance(
         f"generate {args.number_to_generate} images", args.number_to_generate
     ):
