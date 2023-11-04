@@ -2,7 +2,12 @@
 import argparse
 from pathlib import Path
 
-from imageproc.measure import generate_images, measure_performance, save_images
+from imageproc.measure import (
+    generate_images,
+    measure_performance,
+    save_images,
+    save_images_multithreaded,
+)
 
 
 def measure():
@@ -44,10 +49,27 @@ def measure():
         f"generate {args.number_to_generate} images", args.number_to_generate
     ):
         images = list(generate_images(**vars(args)))
-    with measure_performance("save png images", args.number_to_generate):
+    with measure_performance("save png images", args.number_to_generate) as t_png:
         save_images(images, Path("output"))
-    with measure_performance("save jpg images", args.number_to_generate):
+    with measure_performance("save jpg images", args.number_to_generate) as t_jpg:
         save_images(images, Path("output"), extension="jpg")
+
+    with measure_performance(
+        "save png images multithreaded", args.number_to_generate
+    ) as t_png_mt:
+        save_images_multithreaded(images, Path("output"))
+    with measure_performance(
+        "save jpg images multithreaded", args.number_to_generate
+    ) as t_jpg_mt:
+        save_images_multithreaded(images, Path("output"), extension="jpg")
+
+    # print performance improvement
+    print(
+        f"Multithreaded PNG save is {t_png[0]/t_png_mt[0]:.2f} times faster than single threaded"
+    )
+    print(
+        f"Multithreaded JPG save is {t_jpg[0]/t_jpg_mt[0]:.2f} times faster than single threaded"
+    )
 
 
 if __name__ == "__main__":
