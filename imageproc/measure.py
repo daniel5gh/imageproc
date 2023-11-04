@@ -1,84 +1,12 @@
-import asyncio
 import contextlib
 import time
-from concurrent.futures import ThreadPoolExecutor
 
-import cv2
-import numpy as np
 import psutil
-import tqdm
-import tqdm.asyncio
 
-
-def generate_images(number_to_generate=10, width=512, height=512, depth=3):
-    """yield images in numpy arrays with random noise"""
-
-    for _ in range(number_to_generate):
-        yield np.random.randint(0, 255, (width, height, depth), dtype=np.uint8)
-
-
-def save_images(images, destination, extension="png"):
-    """save images to destination"""
-
-    destination.mkdir(parents=True, exist_ok=True)
-
-    for index, image in tqdm.tqdm(enumerate(images), total=len(images)):
-        cv2.imwrite(f"{destination}/image_{index}.{extension}", image)
-
-
-def save_images_multithreaded(images, destination, extension="png"):
-    """save images to destination"""
-
-    with tqdm.tqdm(total=len(images)) as progress_bar:
-
-        def update_progress_bar(*args):
-            progress_bar.update(1)
-
-        destination.mkdir(parents=True, exist_ok=True)
-
-        with ThreadPoolExecutor() as executor:
-            futures = []
-            for index, image in enumerate(images):
-                future = executor.submit(
-                    cv2.imwrite,
-                    f"{destination}/image_{index}.{extension}",
-                    image,
-                )
-                future.add_done_callback(update_progress_bar)
-                futures.append(future)
-            for future in futures:
-                future.result()
-
-
-async def save_image_async(image, file_path):
-    """save single image"""
-
-    cv2.imwrite(file_path, image)
-
-
-async def save_images_async(images, destination, extension="png"):
-    """save images to destination"""
-
-    destination.mkdir(parents=True, exist_ok=True)
-
-    tasks = []
-    for index, image in enumerate(images):
-        task = save_image_async(
-            image, f"{destination}/image_{index}.{extension}"
-        )
-        tasks.append(task)
-
-    # use tqdm gather to show progress bar
-    await tqdm.asyncio.tqdm.gather(*tasks)
-
-
-def save_images_in_asyncio_loop(images, destination, extension="png"):
-    """get event loop and run async function"""
-
-    # get main thread event loop
-    loop = asyncio.get_event_loop()
-    # and run the async function
-    loop.run_until_complete(asyncio.wait([save_images_async(images, destination, extension)]))
+from .image_sources import generate_images
+from .simple_save_async import save_images_in_asyncio_loop
+from .simple_save_single_thead import save_images
+from .simple_save_threadpool import save_images_multithreaded
 
 
 @contextlib.contextmanager
@@ -127,11 +55,11 @@ def experiment1(args, output_path):
     with measure_performance(
         "save png images asyncio", args.number_to_generate
     ) as t_png_async:
-        save_images_multithreaded(images, output_path / "output_as")
+        save_images_in_asyncio_loop(images, output_path / "output_as")
     with measure_performance(
         "save jpg images asyncio", args.number_to_generate
     ) as t_jpg_async:
-        save_images_multithreaded(images, output_path / "output_as", extension="jpg")
+        save_images_in_asyncio_loop(images, output_path / "output_as", extension="jpg")
     # print performance improvements
     print(
         f"Multi-threaded PNG save is {t_png[0] / t_png_mt[0]:.2f} times faster than single threaded"

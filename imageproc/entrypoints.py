@@ -46,14 +46,46 @@ def measure():
         action="store_true",
         help="Use /dev/shm instead of current dir, Default: False",
     )
+    parser.add_argument(
+        "-r",
+        "--readme",
+        default=False,
+        action="store_true",
+        help="Generate a README.md block with the results",
+    )
 
     args = parser.parse_args()
 
     dir_ = "/dev/shm" if args.shm else "."
     del args.shm
 
-    with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
-        experiment1(args, Path(tmp_dirname))
+    readme = args.readme
+    del args.readme
+
+    if not readme:
+        with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
+            experiment1(args, Path(tmp_dirname))
+    else:
+        for n in (100, 500, 2000):
+            with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
+                print(
+                    f"## {n} images\n\n```bash\npoetry run imageproc_measure --num-images {n}\n```\n\n```\n"
+                )
+
+                args.number_to_generate = n
+                experiment1(args, Path(tmp_dirname))
+
+                print("```\n\n")
+
+        with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
+            print(
+                f"## {n} images using SHM\n\n```bash\npoetry run imageproc_measure --num-images {n}\n```\n\n```\n"
+            )
+
+            args.number_to_generate = n
+            experiment1(args, Path(tmp_dirname))
+
+            print("```\n")
 
 
 if __name__ == "__main__":
