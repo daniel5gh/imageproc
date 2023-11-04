@@ -7,5 +7,10 @@ def save_images(images, destination, extension="png"):
 
     destination.mkdir(parents=True, exist_ok=True)
 
-    for index, image in tqdm(enumerate(images), total=len(images)):
+    if hasattr(images, "__len__"):
+        total = len(images)
+    else:
+        total = None
+
+    for index, image in tqdm(enumerate(images), total=total):
         cv2.imwrite(f"{destination}/image_{index}.{extension}", image)

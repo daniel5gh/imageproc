@@ -20,10 +20,10 @@ async def save_images_async(images, destination, extension="png"):
     destination.mkdir(parents=True, exist_ok=True)
 
     tasks = []
+    # We consume the generator here, so we don't have to worry about
+    # the generator being consumed in multiple threads
     for index, image in enumerate(images):
-        task = save_image_async(
-            image, f"{destination}/image_{index}.{extension}"
-        )
+        task = save_image_async(image, f"{destination}/image_{index}.{extension}")
         tasks.append(task)
 
     # use tqdm gather to show progress bar
@@ -37,4 +37,3 @@ def save_images_in_asyncio_loop(images, destination, extension="png"):
     loop = asyncio.get_event_loop()
     # and run the async function
     loop.run_until_complete(save_images_async(images, destination, extension))
-

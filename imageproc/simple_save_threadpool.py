@@ -7,7 +7,12 @@ from tqdm import tqdm
 def save_images_multithreaded(images, destination, extension="png"):
     """save images to destination"""
 
-    with tqdm(total=len(images)) as progress_bar:
+    if hasattr(images, "__len__"):
+        total = len(images)
+    else:
+        total = None
+
+    with tqdm(total=total) as progress_bar:
 
         def update_progress_bar(*args):
             progress_bar.update(1)

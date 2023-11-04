@@ -53,6 +53,13 @@ def measure():
         action="store_true",
         help="Generate a README.md block with the results",
     )
+    parser.add_argument(
+        "-v",
+        "--video",
+        default=False,
+        action="store_true",
+        help="Use a video file as input instead of random noise",
+    )
 
     args = parser.parse_args()
 
