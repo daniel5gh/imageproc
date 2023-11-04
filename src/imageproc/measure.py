@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -45,6 +46,35 @@ def save_images_multithreaded(images, destination, extension="png"):
                 futures.append(future)
             for future in futures:
                 future.result()
+
+
+def save_images_asyncio(images, destination, extension="png"):
+    """save images to destination"""
+
+    # get main thread event loop
+    loop = asyncio.get_event_loop()
+
+    # not using tqdm.asyncio.tqdm because this method is not async itself
+    with tqdm.tqdm(total=len(images)) as progress_bar:
+
+        def update_progress_bar(*args):
+            progress_bar.update(1)
+
+        destination.mkdir(parents=True, exist_ok=True)
+
+        # create tasks
+        tasks = []
+        for index, image in enumerate(images):
+            task = loop.run_in_executor(
+                None,
+                cv2.imwrite,
+                f"{destination}/image_{index}.{extension}",
+                image,
+            )
+            task.add_done_callback(update_progress_bar)
+            tasks.append(task)
+        # wait for tasks to complete
+        loop.run_until_complete(asyncio.wait(tasks))
 
 
 @contextlib.contextmanager

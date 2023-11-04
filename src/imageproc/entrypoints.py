@@ -50,26 +50,46 @@ def measure():
     ):
         images = list(generate_images(**vars(args)))
     with measure_performance("save png images", args.number_to_generate) as t_png:
-        save_images(images, Path("output"))
+        save_images(images, Path("output_st"))
     with measure_performance("save jpg images", args.number_to_generate) as t_jpg:
-        save_images(images, Path("output"), extension="jpg")
+        save_images(images, Path("output_st"), extension="jpg")
 
     with measure_performance(
-        "save png images multithreaded", args.number_to_generate
+        "save png images multi-threaded", args.number_to_generate
     ) as t_png_mt:
-        save_images_multithreaded(images, Path("output"))
+        save_images_multithreaded(images, Path("output_mt"))
     with measure_performance(
-        "save jpg images multithreaded", args.number_to_generate
+        "save jpg images multi-threaded", args.number_to_generate
     ) as t_jpg_mt:
-        save_images_multithreaded(images, Path("output"), extension="jpg")
+        save_images_multithreaded(images, Path("output_mt"), extension="jpg")
 
-    # print performance improvement
+    with measure_performance(
+        "save png images multi-threaded", args.number_to_generate
+    ) as t_png_async:
+        save_images_multithreaded(images, Path("output_as"))
+    with measure_performance(
+        "save jpg images multi-threaded", args.number_to_generate
+    ) as t_jpg_async:
+        save_images_multithreaded(images, Path("output_as"), extension="jpg")
+
+    # print performance improvements
     print(
-        f"Multithreaded PNG save is {t_png[0]/t_png_mt[0]:.2f} times faster than single threaded"
+        f"Multi-threaded PNG save is {t_png[0]/t_png_mt[0]:.2f} times faster than single threaded"
     )
     print(
-        f"Multithreaded JPG save is {t_jpg[0]/t_jpg_mt[0]:.2f} times faster than single threaded"
+        f"Multi-threaded JPG save is {t_jpg[0]/t_jpg_mt[0]:.2f} times faster than single threaded"
     )
+    print(
+        f"Asyncio PNG save is {t_png[0]/t_png_async[0]:.2f} times faster than single threaded"
+    )
+    print(
+        f"Asyncio JPG save is {t_jpg[0]/t_jpg_async[0]:.2f} times faster than single threaded"
+    )
+
+    # clean up output directories
+    Path("output_st").rmdir()
+    Path("output_mt").rmdir()
+    Path("output_as").rmdir()
 
 
 if __name__ == "__main__":
