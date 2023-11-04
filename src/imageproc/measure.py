@@ -3,6 +3,7 @@ import time
 
 import cv2
 import numpy as np
+import tqdm
 
 
 def generate_images(number_to_generate=10, width=512, height=512, depth=3):
@@ -17,7 +18,7 @@ def save_images(images, destination, extension="png"):
 
     destination.mkdir(parents=True, exist_ok=True)
 
-    for index, image in enumerate(images):
+    for index, image in tqdm.tqdm(enumerate(images), total=len(images)):
         cv2.imwrite(f"{destination}/image_{index}.{extension}", image)
 
 
