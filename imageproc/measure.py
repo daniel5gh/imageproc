@@ -40,13 +40,18 @@ def experiment1(args, output_path):
         with measure_performance(
             f"generate {args.number_to_generate} images", args.number_to_generate
         ):
-            images = list(generate_images(**vars(args)))
+            images = list(
+                generate_images(
+                    args.number_to_generate, args.width, args.height, args.depth
+                )
+            )
     else:
         with measure_performance("read video"):
             # make iterator that creates a new generator every time
             class VideoIterator:
                 def __iter__(self):
                     return read_from_video("input/charge_teaser06wide-720p.mp4")
+
             images = VideoIterator()
 
     with measure_performance("save png images", args.number_to_generate) as t_png:
