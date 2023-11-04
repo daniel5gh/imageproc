@@ -24,7 +24,6 @@ def save_images_multithreaded(images, destination, extension="png"):
                 )
                 future.add_done_callback(update_progress_bar)
                 futures.append(future)
-            for future in futures:
-                future.result()
+            executor.shutdown(wait=True)
 
 
