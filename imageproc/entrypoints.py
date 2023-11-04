@@ -79,7 +79,7 @@ def measure():
 
         with tempfile.TemporaryDirectory(dir=dir_, prefix="output-") as tmp_dirname:
             print(
-                f"## {n} images using SHM\n\n```bash\npoetry run imageproc_measure --num-images {n}\n```\n\n```\n"
+                f"## {n} images using SHM\n\n```bash\npoetry run imageproc_measure --num-images {n} --shm\n```\n\n```\n"
             )
 
             args.number_to_generate = n
