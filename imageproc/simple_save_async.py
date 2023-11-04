@@ -5,7 +5,11 @@ import tqdm.asyncio
 
 
 async def save_image_async(image, file_path):
-    """save single image"""
+    """save single image
+
+    basically same as single threaded version, cv2 does not support async. Also,
+    we expect imwrite to be cpu bound, so we don't gain much from async.
+    """
 
     cv2.imwrite(file_path, image)
 
